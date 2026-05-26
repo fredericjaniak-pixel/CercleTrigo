@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cercle Trigonométrique – Enroulement</title>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#eef1f7;padding:16px;min-height:100vh;}
+header{text-align:center;margin-bottom:20px;}
+header h1{font-size:clamp(1.1em,2.5vw,1.7em);color:#1a252f;margin-bottom:4px;}
+header p{color:#555;font-size:clamp(0.85em,2vw,1em);}
+.layout{display:grid;grid-template-columns:1fr 320px;gap:20px;max-width:1120px;margin:0 auto;}
+@media(max-width:800px){.layout{grid-template-columns:1fr;}}
+.canvas-wrap{background:white;border-radius:16px;padding:10px;box-shadow:0 8px 30px rgba(0,0,0,0.12);border:3px solid #2c3e50;}
+canvas{width:100%;height:auto;display:block;border-radius:10px;}
+.panel{display:flex;flex-direction:column;gap:14px;}
+.card{background:white;border-radius:16px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,0.12);}
+.card h3{font-size:0.95em;color:#2c3e50;margin-bottom:12px;border-bottom:2px solid #3498db;padding-bottom:6px;}
+.slider-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+#sliderA{flex:1;-webkit-appearance:none;height:10px;border-radius:8px;background:linear-gradient(90deg,#e74c3c,#3498db);outline:none;cursor:pointer;}
+#sliderA::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:#e74c3c;cursor:pointer;box-shadow:0 3px 10px rgba(231,76,60,0.5);}
+#sliderA::-moz-range-thumb{width:28px;height:28px;border-radius:50%;background:#e74c3c;cursor:pointer;border:none;}
+.aval{font-size:1.15em;font-weight:bold;color:#e74c3c;display:inline-block;min-width:100px;}
+.infobox{background:linear-gradient(135deg,#2c3e50,#34495e);color:white;border-radius:12px;padding:16px;}
+.ligne{margin:6px 0;padding:9px 12px;background:rgba(255,255,255,0.1);border-radius:8px;font-size:0.92em;line-height:1.6;min-height:38px;}
+.gros{font-weight:bold;}
+.grille-btn{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+.btn-val{padding:9px 4px;border:2px solid #3498db;background:rgba(52,152,219,0.1);border-radius:10px;cursor:pointer;font-weight:600;font-size:0.78em;color:#2c3e50;transition:all 0.2s;line-height:1.5;text-align:center;}
+.btn-val:hover{background:#3498db;color:white;}
+.btn-val.active{background:#e74c3c;color:white;border-color:#c0392b;}
+.mode-btns{display:flex;flex-direction:column;gap:8px;}
+.mode-btn{padding:11px 10px;border:2px solid #9b59b6;background:rgba(155,89,182,0.08);border-radius:10px;cursor:pointer;font-weight:600;font-size:0.82em;color:#2c3e50;transition:all 0.2s;text-align:center;line-height:1.5;}
+.mode-btn:hover{background:#9b59b6;color:white;}
+.mode-btn.active{background:#9b59b6;color:white;box-shadow:0 4px 14px rgba(155,89,182,0.4);}
+.legende{font-size:0.79em;color:#555;display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;}
+.leg-item{display:flex;align-items:center;gap:4px;}
+.leg-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;}
+</style>
+</head>
+<body>
+<header>
+  <h1>Enroulement de la droite des réels sur le cercle trigonométrique</h1>
+  <p>Spécialité Mathématiques – Première &nbsp;|&nbsp; Cercle centre O, rayon 1 &nbsp;|&nbsp; Droite d'équation \(x = 1\)</p>
+</header>
+<div class="layout">
+  <div class="canvas-wrap">
+    <canvas id="canvas" width="620" height="560"></canvas>
+    <div class="legende">
+      <div class="leg-item"><div class="leg-dot" style="background:#3498db"></div>Cercle unité</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#27ae60"></div>Droite x=1</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#e67e22"></div>Vecteurs unitaires</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#f39c12"></div>Point A</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#e74c3c"></div>Point M</div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="card">
+      <h3>Mesure de l'angle \(\theta\) (angle orienté)</h3>
+      <div class="mode-btns">
+        <button class="mode-btn active" data-mode="direct">Sens direct &nbsp;\(\theta \in [0\,;\,2\pi[\)</button>
+        <button class="mode-btn" data-mode="indirect">Sens indirect &nbsp;\(\theta \in {]{-2\pi}\,;\,0]}\)</button>
+        <button class="mode-btn" data-mode="principale">Mesure principale &nbsp;\(\theta \in {]{-\pi}\,;\,\pi]}\)</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Paramètre \(a \in [-10\,;\,+10]\) (rad)</h3>
+      <div class="slider-row">
+        <span style="font-size:0.82em;color:#888;">\(-10\)</span>
+        <input type="range" id="sliderA" min="-10" max="10" step="any" value="0">
+        <span style="font-size:0.82em;color:#888;">\(+10\)</span>
+      </div>
+      <div style="text-align:center;margin-top:6px;">\(a =\) <span id="aVal" class="aval">\(0 \text{ rad}\)</span></div>
+      <div style="text-align:center;font-size:0.79em;color:#888;margin-top:4px;">Touches ← → (pas \(\pi/32\))</div>
+    </div>
+    <div class="infobox" id="infobox">
+      <div class="ligne gros" id="infoA">\(A(1{,}0\,;\,0{,}0)\)</div>
+      <div class="ligne" id="infoTheta">\(\theta = 0\text{ rad}\)</div>
+      <div class="ligne gros" id="infoM">\(M(\cos 0\,;\,\sin 0)\)</div>
+      <div class="ligne" id="infoCoords">\(M(1\,;\,0)\)</div>
+    </div>
+    <div class="card">
+      <h3>Valeurs remarquables</h3>
+      <div class="grille-btn" id="btnGrid"></div>
+    </div>
+  </div>
+</div>
+<script>
+const canvas=document.getElementById('canvas');
+const ctx=canvas.getContext('2d');
+const SC=170,OX=220,OY=280;
+let a=0,mode='direct';
+function px(x){return OX+x*SC;}
+function py(y){return OY-y*SC;}
+function fmt1(v){return v.toFixed(1).replace('.',',');}
+function fmt2(v){return v.toFixed(2).replace('.',',');}
+
+function normPos(v){
+  let r=v%(2*Math.PI);
+  if(r<-1e-9)r+=2*Math.PI;
+  if(Math.abs(r)<1e-9||Math.abs(r-2*Math.PI)<1e-9)r=0;
+  return r;
+}
+function getTheta(a){
+  const v=normPos(a);
+  if(mode==='direct') return v;
+  if(mode==='indirect') return v<1e-9?0:v-2*Math.PI;
+  return v>Math.PI+1e-9?v-2*Math.PI:v;
+}
+
+const TL=[
+  [0,'0'],
+  [Math.PI/6,'\\frac{\\pi}{6}'],[-Math.PI/6,'-\\frac{\\pi}{6}'],
+  [Math.PI/4,'\\frac{\\pi}{4}'],[-Math.PI/4,'-\\frac{\\pi}{4}'],
+  [Math.PI/3,'\\frac{\\pi}{3}'],[-Math.PI/3,'-\\frac{\\pi}{3}'],
+  [Math.PI/2,'\\frac{\\pi}{2}'],[-Math.PI/2,'-\\frac{\\pi}{2}'],
+  [2*Math.PI/3,'\\frac{2\\pi}{3}'],[-2*Math.PI/3,'-\\frac{2\\pi}{3}'],
+  [3*Math.PI/4,'\\frac{3\\pi}{4}'],[-3*Math.PI/4,'-\\frac{3\\pi}{4}'],
+  [5*Math.PI/6,'\\frac{5\\pi}{6}'],[-5*Math.PI/6,'-\\frac{5\\pi}{6}'],
+  [Math.PI,'\\pi'],[-Math.PI,'-\\pi'],
+  [7*Math.PI/6,'\\frac{7\\pi}{6}'],[5*Math.PI/4,'\\frac{5\\pi}{4}'],
+  [4*Math.PI/3,'\\frac{4\\pi}{3}'],[3*Math.PI/2,'\\frac{3\\pi}{2}'],
+  [-3*Math.PI/2,'-\\frac{3\\pi}{2}'],[5*Math.PI/3,'\\frac{5\\pi}{3}'],
+  [7*Math.PI/4,'\\frac{7\\pi}{4}'],[11*Math.PI/6,'\\frac{11\\pi}{6}'],
+  [2*Math.PI,'2\\pi'],[-2*Math.PI,'-2\\pi'],
+];
+const TLC=[
+  [0,'0'],[Math.PI/6,'π/6'],[-Math.PI/6,'−π/6'],
+  [Math.PI/4,'π/4'],[-Math.PI/4,'−π/4'],
+  [Math.PI/3,'π/3'],[-Math.PI/3,'−π/3'],
+  [Math.PI/2,'π/2'],[-Math.PI/2,'−π/2'],
+  [2*Math.PI/3,'2π/3'],[-2*Math.PI/3,'−2π/3'],
+  [3*Math.PI/4,'3π/4'],[-3*Math.PI/4,'−3π/4'],
+  [5*Math.PI/6,'5π/6'],[-5*Math.PI/6,'−5π/6'],
+  [Math.PI,'π'],[-Math.PI,'−π'],
+  [7*Math.PI/6,'7π/6'],[5*Math.PI/4,'5π/4'],
+  [4*Math.PI/3,'4π/3'],[3*Math.PI/2,'3π/2'],
+  [-3*Math.PI/2,'−3π/2'],[5*Math.PI/3,'5π/3'],
+  [7*Math.PI/4,'7π/4'],[11*Math.PI/6,'11π/6'],
+  [2*Math.PI,'2π'],[-2*Math.PI,'−2π'],
+];
+function getThetaLatex(v){for(const[fv,fl]of TL)if(Math.abs(v-fv)<0.006)return fl;return fmt2(v);}
+function getThetaCanvas(v){for(const[fv,fl]of TLC)if(Math.abs(v-fv)<0.006)return fl;return fmt2(v);}
+
+const ME=[
+  [0,'\\left(1\\,;\\,0\\right)'],
+  [Math.PI/6,'\\left(\\frac{\\sqrt{3}}{2}\\,;\\,\\frac{1}{2}\\right)'],
+  [Math.PI/4,'\\left(\\frac{\\sqrt{2}}{2}\\,;\\,\\frac{\\sqrt{2}}{2}\\right)'],
+  [Math.PI/3,'\\left(\\frac{1}{2}\\,;\\,\\frac{\\sqrt{3}}{2}\\right)'],
+  [Math.PI/2,'\\left(0\\,;\\,1\\right)'],
+  [2*Math.PI/3,'\\left(-\\frac{1}{2}\\,;\\,\\frac{\\sqrt{3}}{2}\\right)'],
+  [3*Math.PI/4,'\\left(-\\frac{\\sqrt{2}}{2}\\,;\\,\\frac{\\sqrt{2}}{2}\\right)'],
+  [5*Math.PI/6,'\\left(-\\frac{\\sqrt{3}}{2}\\,;\\,\\frac{1}{2}\\right)'],
+  [Math.PI,'\\left(-1\\,;\\,0\\right)'],
+  [7*Math.PI/6,'\\left(-\\frac{\\sqrt{3}}{2}\\,;\\,-\\frac{1}{2}\\right)'],
+  [5*Math.PI/4,'\\left(-\\frac{\\sqrt{2}}{2}\\,;\\,-\\frac{\\sqrt{2}}{2}\\right)'],
+  [4*Math.PI/3,'\\left(-\\frac{1}{2}\\,;\\,-\\frac{\\sqrt{3}}{2}\\right)'],
+  [3*Math.PI/2,'\\left(0\\,;\\,-1\\right)'],
+  [5*Math.PI/3,'\\left(\\frac{1}{2}\\,;\\,-\\frac{\\sqrt{3}}{2}\\right)'],
+  [7*Math.PI/4,'\\left(\\frac{\\sqrt{2}}{2}\\,;\\,-\\frac{\\sqrt{2}}{2}\\right)'],
+  [11*Math.PI/6,'\\left(\\frac{\\sqrt{3}}{2}\\,;\\,-\\frac{1}{2}\\right)'],
+];
+const MEC=[
+  [0,'M(1 ; 0)'],[Math.PI/6,'M(√3/2 ; 1/2)'],[Math.PI/4,'M(√2/2 ; √2/2)'],
+  [Math.PI/3,'M(1/2 ; √3/2)'],[Math.PI/2,'M(0 ; 1)'],[2*Math.PI/3,'M(−1/2 ; √3/2)'],
+  [3*Math.PI/4,'M(−√2/2 ; √2/2)'],[5*Math.PI/6,'M(−√3/2 ; 1/2)'],[Math.PI,'M(−1 ; 0)'],
+  [7*Math.PI/6,'M(−√3/2 ; −1/2)'],[5*Math.PI/4,'M(−√2/2 ; −√2/2)'],[4*Math.PI/3,'M(−1/2 ; −√3/2)'],
+  [3*Math.PI/2,'M(0 ; −1)'],[5*Math.PI/3,'M(1/2 ; −√3/2)'],[7*Math.PI/4,'M(√2/2 ; −√2/2)'],
+  [11*Math.PI/6,'M(√3/2 ; −1/2)'],
+];
+function getMLatex(a){
+  const v=normPos(a);
+  for(const[fv,fl]of ME)if(Math.abs(v-fv)<0.006)return 'M'+fl;
+  return 'M\\left('+fmt1(Math.cos(a))+'\\,;\\,'+fmt1(Math.sin(a))+'\\right)';
+}
+function getMCanvas(a){
+  const v=normPos(a);
+  for(const[fv,fl]of MEC)if(Math.abs(v-fv)<0.006)return fl;
+  return 'M('+fmt1(Math.cos(a))+' ; '+fmt1(Math.sin(a))+')';
+}
+
+function drawArrow(x1,y1,x2,y2,color,lw,hs){
+  ctx.save();ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  const ang=Math.atan2(y2-y1,x2-x1);ctx.fillStyle=color;
+  ctx.beginPath();ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-hs*Math.cos(ang-0.38),y2-hs*Math.sin(ang-0.38));
+  ctx.lineTo(x2-hs*Math.cos(ang+0.38),y2-hs*Math.sin(ang+0.38));
+  ctx.closePath();ctx.fill();ctx.restore();
+}
+
+function drawArcArrow(cx,cy,r,theta,ccw,color){
+  const endA=-theta;
+  const ex=cx+r*Math.cos(endA),ey=cy+r*Math.sin(endA);
+  const tAng=endA+(ccw?-Math.PI/2:Math.PI/2);
+  const hs=10;ctx.fillStyle=color;
+  ctx.beginPath();ctx.moveTo(ex,ey);
+  ctx.lineTo(ex-hs*Math.cos(tAng-0.4),ey-hs*Math.sin(tAng-0.4));
+  ctx.lineTo(ex-hs*Math.cos(tAng+0.4),ey-hs*Math.sin(tAng+0.4));
+  ctx.closePath();ctx.fill();
+}
+
+function draw(){
+  ctx.clearRect(0,0,620,560);
+  const bg=ctx.createLinearGradient(0,0,620,560);
+  bg.addColorStop(0,'#f8faff');bg.addColorStop(1,'#eef2f7');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,620,560);
+  ctx.strokeStyle='#dde3ea';ctx.lineWidth=1;
+  for(let i=-3;i<=3;i++){
+    ctx.beginPath();ctx.moveTo(px(i),15);ctx.lineTo(px(i),545);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(15,py(i));ctx.lineTo(605,py(i));ctx.stroke();
+  }
+  ctx.fillStyle='#aaa';ctx.font='13px serif';ctx.textAlign='center';
+  for(let i=-2;i<=3;i++){
+    if(i===0)continue;
+    ctx.fillText(i,px(i),OY+18);
+    if(i>=-2&&i<=2)ctx.fillText(i,OX-16,py(i)+5);
+  }
+  ctx.strokeStyle='#2c3e50';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(15,OY);ctx.lineTo(605,OY);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(OX,15);ctx.lineTo(OX,545);ctx.stroke();
+  ctx.fillStyle='#2c3e50';ctx.font='bold 16px serif';
+  ctx.textAlign='left';ctx.fillText('O',OX-18,OY+17);
+  // Vecteurs unitaires orange SANS nom
+  drawArrow(OX,OY,px(1),OY,'#e67e22',3,12);
+  drawArrow(OX,OY,OX,py(1),'#e67e22',3,12);
+  // Cercle unité
+  ctx.strokeStyle='#3498db';ctx.lineWidth=4;
+  ctx.beginPath();ctx.arc(OX,OY,SC,0,2*Math.PI);ctx.stroke();
+  // Droite x=1 SANS label
+  ctx.strokeStyle='#27ae60';ctx.lineWidth=2.5;ctx.setLineDash([8,6]);
+  ctx.beginPath();ctx.moveTo(px(1),15);ctx.lineTo(px(1),545);ctx.stroke();
+  ctx.setLineDash([]);
+  // Arc θ avec flèche orientée
+  const theta=getTheta(a),arcR=52;
+  const modeStroke={direct:'#27ae60',indirect:'#e74c3c',principale:'#9b59b6'};
+  const modeAlpha={direct:'rgba(46,204,113,0.15)',indirect:'rgba(231,76,60,0.15)',principale:'rgba(155,89,182,0.15)'};
+  const col=modeStroke[mode],ccw=(theta>0);
+  if(Math.abs(theta)>0.02){
+    ctx.fillStyle=modeAlpha[mode];
+    ctx.beginPath();ctx.moveTo(OX,OY);
+    ctx.arc(OX,OY,arcR,0,-theta,ccw);
+    ctx.closePath();ctx.fill();
+    ctx.strokeStyle=col;ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.arc(OX,OY,arcR,0,-theta,ccw);ctx.stroke();
+    drawArcArrow(OX,OY,arcR,theta,ccw,col);
+  }
+  const midA=-theta/2;
+  ctx.fillStyle=col;ctx.font='bold 14px Arial';ctx.textAlign='center';
+  ctx.fillText('θ = '+getThetaCanvas(theta)+' rad',
+    OX+(arcR+30)*Math.cos(midA),OY+(arcR+30)*Math.sin(midA));
+  // Point A
+  const aypx=py(a),mxc=px(Math.cos(theta)),myc=py(Math.sin(theta));
+  const vis=aypx>18&&aypx<542;
+  if(vis){
+    ctx.strokeStyle='rgba(243,156,18,0.5)';ctx.lineWidth=1.8;ctx.setLineDash([5,5]);
+    ctx.beginPath();ctx.moveTo(px(1),aypx);ctx.lineTo(mxc,myc);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='#f39c12';ctx.shadowColor='#f39c12';ctx.shadowBlur=14;
+    ctx.beginPath();ctx.arc(px(1),aypx,10,0,2*Math.PI);ctx.fill();
+    ctx.shadowBlur=0;
+    ctx.fillStyle='#d35400';ctx.font='bold 15px Arial';ctx.textAlign='left';
+    ctx.fillText('A(1 ; '+fmt1(a)+')',px(1)+14,aypx-10);
+  } else {
+    ctx.fillStyle='#d35400';ctx.font='bold 13px Arial';ctx.textAlign='center';
+    ctx.fillText('A(1 ; '+fmt1(a)+') hors vue',px(1),a>0?30:530);
+  }
+  // Projections
+  ctx.strokeStyle='rgba(52,152,219,0.4)';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(mxc,myc);ctx.lineTo(mxc,OY);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(mxc,myc);ctx.lineTo(OX,myc);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#2980b9';ctx.font='13px Arial';
+  ctx.textAlign='center';ctx.fillText('cos θ',mxc,OY+16);
+  ctx.textAlign='right';ctx.fillText('sin θ',OX-6,myc+5);
+  // Rayon OM
+  ctx.strokeStyle='#e74c3c';ctx.lineWidth=3.5;
+  ctx.beginPath();ctx.moveTo(OX,OY);ctx.lineTo(mxc,myc);ctx.stroke();
+  // Point M
+  ctx.fillStyle='#e74c3c';ctx.shadowColor='#e74c3c';ctx.shadowBlur=18;
+  ctx.beginPath();ctx.arc(mxc,myc,12,0,2*Math.PI);ctx.fill();
+  ctx.shadowBlur=0;
+  const ox2=Math.cos(theta)>=0?18:-18,oy2=Math.sin(theta)>=0?-16:20;
+  ctx.fillStyle='#c0392b';ctx.font='bold 15px Arial';
+  ctx.textAlign=Math.cos(theta)>=0?'left':'right';
+  ctx.fillText('M(cos θ ; sin θ)',mxc+ox2,myc+oy2);
+}
+
+function setMath(id,latex){
+  document.getElementById(id).innerHTML='\\('+latex+'\\)';
+}
+async function update(){
+  a=parseFloat(document.getElementById('sliderA').value);
+  const theta=getTheta(a);
+  const tLbl=getThetaLatex(theta);
+  const aLbl=getThetaLatex(a);
+  const modeStr={direct:'\\text{sens direct}',indirect:'\\text{sens indirect}',principale:'\\text{mesure principale}'}[mode];
+  const modeIntv={direct:'[0\\,;\\,2\\pi[',indirect:']{-2\\pi}\\,;\\,0]',principale:']{-\\pi}\\,;\\,\\pi]'}[mode];
+  const aDisp=(aLbl===fmt2(a))?fmt2(a)+'\\,\\text{rad}':aLbl+'\\,\\text{rad}';
+  document.getElementById('aVal').innerHTML='\\('+aDisp+'\\)';
+  const a1=fmt1(a).replace(',','{,}');
+  setMath('infoA','A\\!\\left(1{,}0\\,;\\,'+a1+'\\right)');
+  setMath('infoTheta','\\theta = '+tLbl+'\\,\\text{rad}\\;['+modeStr+',\\;'+modeIntv+']');
+  setMath('infoM','M\\!\\left(\\cos '+tLbl+'\\,;\\,\\sin '+tLbl+'\\right)');
+  setMath('infoCoords',getMLatex(a));
+  await MathJax.typesetPromise([document.getElementById('infobox'),document.getElementById('aVal')]);
+  draw();
+}
+document.getElementById('sliderA').oninput=update;
+document.querySelectorAll('.mode-btn').forEach(btn=>{
+  btn.onclick=()=>{
+    mode=btn.dataset.mode;
+    document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');update();
+  };
+});
+document.addEventListener('keydown',e=>{
+  const s=Math.PI/32,sl=document.getElementById('sliderA');
+  if(e.key==='ArrowRight'||e.key==='ArrowUp'){sl.value=Math.min(10,+sl.value+s);update();}
+  if(e.key==='ArrowLeft'||e.key==='ArrowDown'){sl.value=Math.max(-10,+sl.value-s);update();}
+});
+const VALS=[
+  {a:0,lbl:'0'},{a:Math.PI/6,lbl:'π/6'},{a:Math.PI/4,lbl:'π/4'},
+  {a:Math.PI/3,lbl:'π/3'},{a:Math.PI/2,lbl:'π/2'},{a:2*Math.PI/3,lbl:'2π/3'},
+  {a:3*Math.PI/4,lbl:'3π/4'},{a:Math.PI,lbl:'π'},{a:3*Math.PI/2,lbl:'3π/2'},
+  {a:2*Math.PI,lbl:'2π'},{a:-Math.PI/4,lbl:'−π/4'},{a:-Math.PI/2,lbl:'−π/2'},
+];
+const grid=document.getElementById('btnGrid');
+VALS.forEach(v=>{
+  const btn=document.createElement('button');
+  btn.className='btn-val';
+  btn.innerHTML='<strong>'+v.lbl+'</strong><br><small>'+getMCanvas(v.a)+'</small>';
+  btn.onclick=()=>{
+    document.getElementById('sliderA').value=v.a;update();
+    document.querySelectorAll('.btn-val').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  };
+  grid.appendChild(btn);
+});
+document.getElementById('sliderA').value=0;
+update();
+</script>
+</body>
+</html>
