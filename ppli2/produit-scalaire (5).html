@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Produit scalaire – Spécialité Maths</title>
+  <style>
+    :root {
+      --bg: #f7f6f2;
+      --surface: #ffffff;
+      --border: #d4d1ca;
+      --text: #22211c;
+      --muted: #6b6860;
+      --accent: #01696f;
+      --accent-soft: #e0ecec;
+      --error: #a12c7b;
+      --radius: 0.6rem;
+      --shadow: 0 8px 24px rgba(0,0,0,0.08);
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.25rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --space-10: 2.5rem;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #ffffff 0, var(--bg) 55%, #e7e3da 100%);
+      color: var(--text);
+    }
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: var(--space-8) var(--space-4) var(--space-10);
+    }
+    header {
+      margin-bottom: var(--space-6);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: var(--space-4);
+      align-items: center;
+    }
+    .title-group h1 {
+      font-size: clamp(1.6rem, 1.2rem + 1vw, 2.1rem);
+      margin: 0 0 var(--space-1);
+    }
+    .title-group p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 2fr);
+      gap: var(--space-6);
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: var(--space-5);
+      border: 1px solid rgba(0,0,0,0.03);
+    }
+
+    h2 {
+      margin-top: 0;
+      margin-bottom: var(--space-3);
+      font-size: 1.2rem;
+    }
+
+    fieldset {
+      border: none;
+      padding: 0;
+      margin: 0 0 var(--space-3);
+    }
+
+    legend {
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+      font-size: 0.95rem;
+    }
+
+    .inputs-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-3) var(--space-4);
+      margin-bottom: var(--space-4);
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    .vector-label,
+    .triangle-label,
+    .angle-mode-label {
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 0.15rem;
+    }
+
+    input[type="number"] {
+      padding: 0.45rem 0.55rem;
+      border-radius: 0.45rem;
+      border: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+
+    input[type="number"]:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .modes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin-top: var(--space-1);
+    }
+
+    .mode-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.2rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #faf9f6;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+    }
+
+    .mode-option input {
+      accent-color: var(--accent);
+    }
+
+    .mode-option.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      box-shadow: 0 0 0 1px rgba(1,105,111,0.15);
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: var(--space-2);
+    }
+
+    .result-main {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+    }
+
+    .result-extra {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: var(--space-3);
+    }
+
+    .explanation {
+      padding: var(--space-3);
+      border-radius: 0.5rem;
+      background: #fbfaf7;
+      border: 1px dashed var(--border);
+      font-size: 0.9rem;
+    }
+
+    .explanation p {
+      margin: 0 0 0.4rem;
+    }
+
+    .explanation p:last-child {
+      margin-bottom: 0;
+    }
+
+    .warning {
+      margin-top: var(--space-2);
+      font-size: 0.85rem;
+      color: var(--error);
+    }
+
+    .canvas-wrapper {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: var(--space-3);
+    }
+
+    canvas {
+      width: 100%;
+      max-width: 440px;
+      aspect-ratio: 1 / 1;
+      border-radius: 0.75rem;
+      border: 1px solid var(--border);
+      background: radial-gradient(circle at center, #ffffff 0, #f5f3ee 60%, #ece7dd 100%);
+    }
+
+    .angle-info {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .chip {
+      width: 11px;
+      height: 11px;
+      border-radius: 999px;
+    }
+
+    .chip-u { background: #006494; }
+    .chip-v { background: #a13544; }
+    .chip-angle { background: #d19900; }
+
+    @media (max-width: 880px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+  </style>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="title-group">
+        <h1>Produit scalaire de deux vecteurs dans le plan</h1>
+        <p>Application interactive (coordonnées, triangle, normes et angle) conforme au programme de spécialité. Repère orthonormé, valeurs exactes si possible.</p>
+      </div>
+      <div class="badge">
+        <span>Vecteurs</span>
+        <span>•</span>
+        <span>Triangle ABC</span>
+        <span>•</span>
+        <span>Normes & angle</span>
+      </div>
+    </header>
+
+    <div class="layout">
+      <section class="card" aria-label="Paramétrage et saisie">
+        <h2>1. Choisir le mode de travail</h2>
+
+        <fieldset>
+          <legend>Mode de travail</legend>
+          <div class="modes" id="workModeContainer">
+            <label class="mode-option active">
+              <input type="radio" name="workMode" value="vecteurs" checked />
+              <span>Vecteurs par coordonnées</span>
+            </label>
+            <label class="mode-option">
+              <input type="radio" name="workMode" value="triangle" />
+              <span>Triangle \(ABC\)</span>
+            </label>
+            <label class="mode-option">
+              <input type="radio" name="workMode" value="angle" />
+              <span>Normes et angle \(\theta\)</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div id="vectorModeBlock">
+          <p class="hint">Mode vecteurs : on donne les coordonnées de \(\vec u(x_u, y_u)\) et \(\vec v(x_v, y_v)\) dans un repère orthonormé.</p>
+          <div class="inputs-grid">
+            <div>
+              <div class="vector-label">Vecteur \(\vec u(x_u, y_u)\)</div>
+              <label>
+                <span>\(x_u\)</span>
+                <input type="number" id="xu" value="2" step="1" />
+              </label>
+              <label>
+                <span>\(y_u\)</span>
+                <input type="number" id="yu" value="1" step="1" />
+              </label>
+            </div>
+            <div>
+              <div class="vector-label">Vecteur \(\vec v(x_v, y_v)\)</div>
+              <label>
+                <span>\(x_v\)</span>
+                <input type="number" id="xv" value="1" step="1" />
+              </label>
+              <label>
+                <span>\(y_v\)</span>
+                <input type="number" id="yv" value="3" step="1" />
+              </label>
+            </div>
+          </div>
+
+          <fieldset>
+            <legend>Formule mise en avant</legend>
+            <div class="modes" id="formulaModeContainer">
+              <label class="mode-option active">
+                <input type="radio" name="formulaMode" value="coord" checked />
+                <span>Par coordonnées</span>
+              </label>
+              <label class="mode-option">
+                <input type="radio" name="formulaMode" value="normes" />
+                <span>Par normes et cosinus</span>
+              </label>
+              <label class="mode-option">
+                <input type="radio" name="formulaMode" value="mixte" />
+                <span>Comparaison des deux</span>
+              </label>
+            </div>
+          </fieldset>
+        </div>
+
+        <div id="triangleModeBlock" style="display:none;">
+          <p class="hint">Mode triangle : on travaille dans un triangle \(ABC\) avec les longueurs \(AB, AC, BC\) et le produit scalaire \(\overrightarrow{AB} \cdot \overrightarrow{AC}\).</p>
+          <div class="inputs-grid">
+            <div>
+              <div class="triangle-label">Côtés donnés</div>
+              <label>
+                <span>Longueur \(AB\)</span>
+                <input type="number" id="AB" value="3" min="0" step="0.1" />
+              </label>
+              <label>
+                <span>Longueur \(AC\)</span>
+                <input type="number" id="AC" value="4" min="0" step="0.1" />
+              </label>
+            </div>
+            <div>
+              <div class="triangle-label">Côté opposé</div>
+              <label>
+                <span>Longueur \(BC\)</span>
+                <input type="number" id="BC" value="5" min="0" step="0.1" />
+              </label>
+            </div>
+          </div>
+          <p class="hint">On utilise \(\overrightarrow{AB} \cdot \overrightarrow{AC} = \tfrac12(AB^2 + AC^2 - BC^2)\) puis \(\overrightarrow{AB} \cdot \overrightarrow{AC} = AB\,AC\,\cos(\widehat{BAC})\).</p>
+        </div>
+
+        <div id="angleModeBlock" style="display:none;">
+          <p class="hint">Mode normes & angle : on connaît \(||\vec u||\), \(||\vec v||\) et l'angle \(\theta = (\vec u, \vec v)\). En mode radian, l'application reconnaît les angles remarquables multiples de \(\pi/12\).</p>
+          <div class="inputs-grid">
+            <div>
+              <div class="angle-mode-label">Normes des vecteurs</div>
+              <label>
+                <span>\(||\vec u||\)</span>
+                <input type="number" id="Nu" value="3" min="0" step="0.1" />
+              </label>
+              <label>
+                <span>\(||\vec v||\)</span>
+                <input type="number" id="Nv" value="2" min="0" step="0.1" />
+              </label>
+            </div>
+            <div>
+              <div class="angle-mode-label">Angle \(\theta\)</div>
+              <label>
+                <span>Valeur de \(\theta\)</span>
+                <input type="number" id="thetaInput" value="60" step="1" />
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <fieldset>
+          <legend>Unité pour l'angle</legend>
+          <div class="modes" id="angleUnitContainer">
+            <label class="mode-option active">
+              <input type="radio" name="angleUnit" value="deg" checked />
+              <span>Degrés</span>
+            </label>
+            <label class="mode-option">
+              <input type="radio" name="angleUnit" value="rad" />
+              <span>Radians</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div id="warning" class="warning" aria-live="polite"></div>
+      </section>
+
+      <section class="card" aria-label="Résultat et représentation graphique">
+        <div class="canvas-wrapper">
+          <div>
+            <h2>2. Produit scalaire et angle</h2>
+            <p class="result-main" id="scalarMain"></p>
+            <p class="result-extra" id="scalarExtra"></p>
+          </div>
+
+          <canvas id="vectorCanvas" width="440" height="440" aria-label="Représentation des vecteurs ou du triangle"></canvas>
+
+          <div>
+            <p class="angle-info" id="angleInfo"></p>
+            <div class="legend">
+              <div class="legend-item"><span class="chip chip-u"></span><span>\(\vec u\) ou \(\overrightarrow{AB}\)</span></div>
+              <div class="legend-item"><span class="chip chip-v"></span><span>\(\vec v\) ou \(\overrightarrow{AC}\)</span></div>
+              <div class="legend-item"><span class="chip chip-angle"></span><span>Angle \((\vec u, \vec v)\) ou \(\widehat{BAC}\)</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top: var(--space-6);" aria-label="Détail du calcul">
+      <h2>3. Détail du calcul selon le mode choisi</h2>
+      <div class="explanation" id="explanation"></div>
+    </section>
+  </div>
+
+  <script>
+    function simplifySqrt(n) {
+      n = Math.abs(n);
+      if (!Number.isInteger(n)) {
+        return { outside: 1, inside: n };
+      }
+      let outside = 1;
+      let inside = n;
+      let factor = 2;
+      while (factor * factor <= inside) {
+        while (inside % (factor * factor) === 0) {
+          inside = inside / (factor * factor);
+          outside *= factor;
+        }
+        factor++;
+      }
+      return { outside, inside };
+    }
+
+    function formatSqrtExact(n) {
+      if (n === 0) return "0";
+      const { outside, inside } = simplifySqrt(n);
+      if (inside === 1) return outside.toString();
+      if (outside === 1) return "\\sqrt{" + inside + "}";
+      return outside + "\\sqrt{" + inside + "}";
+    }
+
+    function formatInteger(n) {
+      return n.toString();
+    }
+
+    function formatFloat(x) {
+      return x.toFixed(3).replace('.', ',');
+    }
+
+    function formatAngle(angleRad, unit) {
+      if (unit === 'deg') {
+        const deg = angleRad * 180 / Math.PI;
+        return deg.toFixed(1).replace('.', ',') + '\u00b0';
+      } else {
+        return angleRad.toFixed(3).replace('.', ',') + '\u00a0rad';
+      }
+    }
+
+    function drawAxes(ctx, canvas, maxAbs) {
+      const margin = 40;
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      const scale = (canvas.width / 2 - margin) / maxAbs;
+
+      ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, cy);
+      ctx.lineTo(canvas.width, cy);
+      ctx.moveTo(cx, 0);
+      ctx.lineTo(cx, canvas.height);
+      ctx.stroke();
+
+      ctx.save();
+      ctx.setLineDash([4, 4]);
+      for (let k = -Math.floor(maxAbs); k <= Math.floor(maxAbs); k++) {
+        if (k === 0) continue;
+        const x = cx + k * scale;
+        const y = cy - k * scale;
+        ctx.beginPath();
+        ctx.moveTo(x, cy - 3);
+        ctx.lineTo(x, cy + 3);
+        ctx.moveTo(cx - 3, cy - k * scale);
+        ctx.lineTo(cx + 3, cy - k * scale);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawArrow(ctx, fromX, fromY, toX, toY, color) {
+      const headLength = 10;
+      const dx = toX - fromX;
+      const dy = toY - fromY;
+      const angle = Math.atan2(dy, dx);
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(fromX, fromY);
+      ctx.lineTo(toX, toY);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(toX, toY);
+      ctx.lineTo(toX - headLength * Math.cos(angle - Math.PI / 6), toY - headLength * Math.sin(angle - Math.PI / 6));
+      ctx.lineTo(toX - headLength * Math.cos(angle + Math.PI / 6), toY - headLength * Math.sin(angle + Math.PI / 6));
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function drawVectors(u, v, thetaOriented) {
+      const canvas = document.getElementById('vectorCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const maxAbs = Math.max(1, Math.abs(u.x), Math.abs(u.y), Math.abs(v.x), Math.abs(v.y));
+      const margin = 40;
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      const scale = (canvas.width / 2 - margin) / maxAbs;
+
+      drawAxes(ctx, canvas, maxAbs);
+
+      const ux = cx + u.x * scale;
+      const uy = cy - u.y * scale;
+      const vx = cx + v.x * scale;
+      const vy = cy - v.y * scale;
+
+      drawArrow(ctx, cx, cy, ux, uy, '#006494');
+      drawArrow(ctx, cx, cy, vx, vy, '#a13544');
+
+      if (thetaOriented !== null && thetaOriented !== undefined) {
+        const thetaCanvas = -thetaOriented;
+        const angUCanvas = Math.atan2(-u.y, u.x);
+        const start = angUCanvas;
+        const end = angUCanvas + thetaCanvas;
+        const r = 40;
+        ctx.beginPath();
+        ctx.strokeStyle = '#d19900';
+        ctx.lineWidth = 2;
+        ctx.arc(cx, cy, r, start, end, thetaCanvas < 0);
+        ctx.stroke();
+        const mid = (start + end) / 2;
+        const ax = cx + (r + 8) * Math.cos(mid);
+        const ay = cy + (r + 8) * Math.sin(mid);
+        ctx.beginPath();
+        ctx.moveTo(ax, ay);
+        ctx.lineTo(ax - 6 * Math.cos(mid - Math.PI / 2), ay - 6 * Math.sin(mid - Math.PI / 2));
+        ctx.lineTo(ax - 6 * Math.cos(mid + Math.PI / 2), ay - 6 * Math.sin(mid + Math.PI / 2));
+        ctx.closePath();
+        ctx.fillStyle = '#d19900';
+        ctx.fill();
+      }
+    }
+
+    function drawTriangle(AB, AC, angleRad) {
+      const canvas = document.getElementById('vectorCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const A = { x: 0, y: 0 };
+      const B = { x: AB, y: 0 };
+      const C = { x: AC * Math.cos(angleRad), y: AC * Math.sin(angleRad) };
+
+      const maxAbs = Math.max(1, Math.abs(A.x), Math.abs(A.y), Math.abs(B.x), Math.abs(B.y), Math.abs(C.x), Math.abs(C.y));
+      drawAxes(ctx, canvas, maxAbs);
+
+      const margin = 40;
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      const scale = (canvas.width / 2 - margin) / maxAbs;
+
+      function toCanvas(p) {
+        return { x: cx + p.x * scale, y: cy - p.y * scale };
+      }
+
+      const Ac = toCanvas(A);
+      const Bc = toCanvas(B);
+      const Cc = toCanvas(C);
+
+      ctx.strokeStyle = '#c0b8a0';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(Ac.x, Ac.y);
+      ctx.lineTo(Bc.x, Bc.y);
+      ctx.lineTo(Cc.x, Cc.y);
+      ctx.closePath();
+      ctx.stroke();
+
+      drawArrow(ctx, Ac.x, Ac.y, Bc.x, Bc.y, '#006494');
+      drawArrow(ctx, Ac.x, Ac.y, Cc.x, Cc.y, '#a13544');
+
+      const thetaOriented = angleRad;
+      const thetaCanvas = -thetaOriented;
+      const angUCanvas = Math.atan2(-B.y, B.x);
+      const start = angUCanvas;
+      const end = angUCanvas + thetaCanvas;
+      const r = 40;
+      ctx.beginPath();
+      ctx.strokeStyle = '#d19900';
+      ctx.lineWidth = 2;
+      ctx.arc(cx, cy, r, start, end, thetaCanvas < 0);
+      ctx.stroke();
+      const mid = (start + end) / 2;
+      const ax = cx + (r + 8) * Math.cos(mid);
+      const ay = cy + (r + 8) * Math.sin(mid);
+      ctx.beginPath();
+      ctx.moveTo(ax, ay);
+      ctx.lineTo(ax - 6 * Math.cos(mid - Math.PI / 2), ay - 6 * Math.sin(mid - Math.PI / 2));
+      ctx.lineTo(ax - 6 * Math.cos(mid + Math.PI / 2), ay - 6 * Math.sin(mid + Math.PI / 2));
+      ctx.closePath();
+      ctx.fillStyle = '#d19900';
+      ctx.fill();
+
+      ctx.fillStyle = '#22211c';
+      const rPt = 4;
+      [[Ac, 'A'], [Bc, 'B'], [Cc, 'C']].forEach(([P, label]) => {
+        ctx.beginPath();
+        ctx.arc(P.x, P.y, rPt, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.font = '12px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(label, P.x + 6, P.y - 4);
+      });
+    }
+
+    function clearCanvas() {
+      const canvas = document.getElementById('vectorCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawAxes(ctx, canvas, 2);
+    }
+
+    function getExactCosTex(angleRad) {
+      const t = angleRad / Math.PI;
+      const nFloat = t * 12;
+      const n = Math.round(nFloat);
+      if (Math.abs(nFloat - n) > 1e-6) return null;
+      if (n < 0 || n > 24) return null;
+      const baseIndex = n <= 12 ? n : 24 - n;
+      const baseMap = {
+        0: '1',
+        1: '\\dfrac{\\sqrt{6}+\\sqrt{2}}{4}',
+        2: '\\dfrac{\\sqrt{3}}{2}',
+        3: '\\dfrac{\\sqrt{2}}{2}',
+        4: '\\dfrac{1}{2}',
+        5: '\\dfrac{\\sqrt{6}-\\sqrt{2}}{4}',
+        6: '0',
+        7: '-\\dfrac{\\sqrt{6}-\\sqrt{2}}{4}',
+        8: '-\\dfrac{1}{2}',
+        9: '-\\dfrac{\\sqrt{2}}{2}',
+        10: '-\\dfrac{\\sqrt{3}}{2}',
+        11: '-\\dfrac{\\sqrt{6}+\\sqrt{2}}{4}',
+        12: '-1'
+      };
+      return baseMap[baseIndex] || null;
+    }
+
+    function updateCalculations() {
+      const workMode = document.querySelector('input[name="workMode"]:checked').value;
+      const angleUnit = document.querySelector('input[name="angleUnit"]:checked').value;
+
+      const warningEl = document.getElementById('warning');
+      const scalarMain = document.getElementById('scalarMain');
+      const scalarExtra = document.getElementById('scalarExtra');
+      const explanation = document.getElementById('explanation');
+      const angleInfo = document.getElementById('angleInfo');
+
+      warningEl.textContent = '';
+      scalarMain.textContent = '';
+      scalarExtra.textContent = '';
+      explanation.innerHTML = '';
+      angleInfo.textContent = '';
+
+      if (workMode === 'triangle') {
+        const AB = parseFloat(document.getElementById('AB').value || '0');
+        const AC = parseFloat(document.getElementById('AC').value || '0');
+        const BC = parseFloat(document.getElementById('BC').value || '0');
+
+        if (AB <= 0 || AC <= 0 || BC <= 0 || AB + AC <= BC || AB + BC <= AC || AC + BC <= AB) {
+          warningEl.textContent = "Les longueurs doivent être strictement positives et vérifier l'inégalité triangulaire.";
+          clearCanvas();
+          explanation.innerHTML = '<p>Choisir des longueurs possibles pour un triangle : chaque côté doit être inférieur à la somme des deux autres.</p>';
+          if (window.MathJax) MathJax.typesetPromise();
+          return;
+        }
+
+        const dot = 0.5 * (AB * AB + AC * AC - BC * BC);
+        const cosNum = dot / (AB * AC);
+        const cosClamped = Math.max(-1, Math.min(1, cosNum));
+        const angleRad = Math.acos(cosClamped);
+
+        scalarMain.textContent = 'Produit scalaire : ' + formatFloat(dot);
+        scalarExtra.textContent = 'Normes : AB = ' + formatFloat(AB) + ', AC = ' + formatFloat(AC) + ', cos(θ) ≈ ' + formatFloat(cosNum) + ', θ ≈ ' + formatAngle(angleRad, angleUnit) + '.';
+
+        let html = '';
+        html += '<p><strong>Formule dans un triangle :</strong> ';
+        html += '\\( \\overrightarrow{AB} \\cdot \\overrightarrow{AC} = \\tfrac12(AB^2 + AC^2 - BC^2). \\)';
+        html += '</p>';
+        html += '<p>Avec les longueurs données : ';
+        html += '\\[ \\overrightarrow{AB} \\cdot \\overrightarrow{AC} = \\tfrac12(' + AB.toFixed(1) + '^2 + ' + AC.toFixed(1) + '^2 - ' + BC.toFixed(1) + '^2). \\]';
+        html += '</p>';
+        html += '<p>On retrouve aussi : ';
+        html += '\\[ \\overrightarrow{AB} \\cdot \\overrightarrow{AC} = AB \\times AC \\times \\cos(\\widehat{BAC}). \\]';
+        html += '</p>';
+        explanation.innerHTML = html;
+
+        angleInfo.textContent = 'Angle \u02c6(BAC) ≈ ' + formatAngle(angleRad, angleUnit) + ' (0° ≤ θ ≤ 180°).';
+
+        drawTriangle(AB, AC, angleRad);
+
+        if (window.MathJax) MathJax.typesetPromise();
+        return;
+      }
+
+      if (workMode === 'angle') {
+        const Nu = parseFloat(document.getElementById('Nu').value || '0');
+        const Nv = parseFloat(document.getElementById('Nv').value || '0');
+        const thetaInput = parseFloat(document.getElementById('thetaInput').value || '0');
+
+        if (Nu <= 0 || Nv <= 0) {
+          warningEl.textContent = 'Les normes doivent être strictement positives.';
+          clearCanvas();
+          explanation.innerHTML = '<p>Choisir des valeurs strictement positives pour les normes des vecteurs.</p>';
+          if (window.MathJax) MathJax.typesetPromise();
+          return;
+        }
+
+        let angleRad;
+        if (angleUnit === 'deg') {
+          if (thetaInput < 0 || thetaInput > 180) {
+            warningEl.textContent = 'En mode degré, on travaille avec un angle θ entre 0° et 180°.';
+          }
+          angleRad = thetaInput * Math.PI / 180;
+        } else {
+          if (thetaInput < 0 || thetaInput > Math.PI) {
+            warningEl.textContent = 'En mode radian, on travaille avec un angle θ entre 0 et π.';
+          }
+          angleRad = thetaInput;
+        }
+
+        const cosNum = Math.cos(angleRad);
+        const dot = Nu * Nv * cosNum;
+
+        scalarMain.textContent = 'Produit scalaire : ' + formatFloat(dot);
+        scalarExtra.textContent = 'Normes : ||u|| = ' + formatFloat(Nu) + ', ||v|| = ' + formatFloat(Nv) + ', cos(θ) ≈ ' + formatFloat(cosNum) + ', θ ≈ ' + formatAngle(angleRad, angleUnit) + '.';
+
+        let html = '';
+        html += '<p><strong>Formule générale :</strong> ';
+        html += '\\( \\vec u \\cdot \\vec v = ||\\vec u||\\,||\\vec v||\\,\\cos(\\theta). \\)';
+        html += '</p>';
+        html += '<p>Données : ';
+        if (angleUnit === 'deg') {
+          html += '\\( ||\\vec u|| = ' + formatFloat(Nu) + ',\\ ||\\vec v|| = ' + formatFloat(Nv) + ',\\ \\theta = ' + thetaInput.toFixed(1).replace('.', ',') + '^\\circ \\).';
+        } else {
+          html += '\\( ||\\vec u|| = ' + formatFloat(Nu) + ',\\ ||\\vec v|| = ' + formatFloat(Nv) + ',\\ \\theta = ' + formatFloat(thetaInput) + '\\text{ rad} \\).';
+        }
+        html += '</p>';
+
+        let exactCos = null;
+        if (angleUnit === 'rad') {
+          exactCos = getExactCosTex(angleRad);
+        }
+
+        if (exactCos) {
+          html += '<p>Valeur remarquable : ';
+          html += '\\( \\cos(\\theta) = ' + exactCos + ' \\).';
+          html += '</p>';
+        } else {
+          html += '<p>\\( \\cos(\\theta) \\approx ' + formatFloat(cosNum) + ' \\).';
+          html += '</p>';
+        }
+
+        html += '<p>Donc : ';
+        html += '\\[ \\vec u \\cdot \\vec v = ||\\vec u||\\,||\\vec v||\\,\\cos(\\theta) = ' + formatFloat(Nu) + ' \\times ' + formatFloat(Nv) + ' \\times \\cos(\\theta). \\]';
+        html += '</p>';
+
+        explanation.innerHTML = html;
+
+        angleInfo.textContent = 'Angle (u,v) ≈ ' + formatAngle(angleRad, angleUnit) + ' (0° ≤ θ ≤ 180°).';
+
+        const u = { x: Nu, y: 0 };
+        const v = { x: Nv * Math.cos(angleRad), y: Nv * Math.sin(angleRad) };
+        drawVectors(u, v, angleRad);
+
+        if (window.MathJax) MathJax.typesetPromise();
+        return;
+      }
+
+      const xu = parseInt(document.getElementById('xu').value || '0', 10);
+      const yu = parseInt(document.getElementById('yu').value || '0', 10);
+      const xv = parseInt(document.getElementById('xv').value || '0', 10);
+      const yv = parseInt(document.getElementById('yv').value || '0', 10);
+
+      const nu2 = xu * xu + yu * yu;
+      const nv2 = xv * xv + yv * yv;
+      const dot = xu * xv + yu * yv;
+
+      if (nu2 === 0 || nv2 === 0) {
+        warningEl.textContent = "Produit scalaire non défini si l'un des vecteurs est nul.";
+        clearCanvas();
+        explanation.innerHTML = '<p>Choisir des coordonnées non nulles pour les deux vecteurs afin de définir l\'angle et le produit scalaire.</p>';
+        if (window.MathJax) MathJax.typesetPromise();
+        return;
+      }
+
+      const normUNum = Math.sqrt(nu2);
+      const normVNum = Math.sqrt(nv2);
+      const normUExact = formatSqrtExact(nu2);
+      const normVExact = formatSqrtExact(nv2);
+      const cosNum = dot / (normUNum * normVNum);
+      const cosClamped = Math.max(-1, Math.min(1, cosNum));
+      const angleRad = Math.acos(cosClamped);
+
+      scalarMain.textContent = 'Produit scalaire : ' + dot;
+      scalarExtra.textContent = 'Normes : ||u|| = ' + formatFloat(normUNum) + ', ||v|| = ' + formatFloat(normVNum) + ', cos(θ) ≈ ' + formatFloat(cosNum) + ', θ ≈ ' + formatAngle(angleRad, angleUnit) + '.';
+
+      const mode = document.querySelector('input[name="formulaMode"]:checked').value;
+      const xuStr = formatInteger(xu);
+      const yuStr = formatInteger(yu);
+      const xvStr = formatInteger(xv);
+      const yvStr = formatInteger(yv);
+      const dotStr = formatInteger(dot);
+
+      let htmlV = '';
+      if (mode === 'coord') {
+        htmlV += '<p><strong>Formule dans un repère orthonormé :</strong> ';
+        htmlV += '\\( \\vec u(x_u, y_u), \\vec v(x_v, y_v) \\Rightarrow \\vec u \\cdot \\vec v = x_u x_v + y_u y_v. \\)';
+        htmlV += '</p>';
+        htmlV += '<p>Avec les coordonnées saisies : ';
+        htmlV += '\\( \\vec u(' + xuStr + ',' + yuStr + '), \\vec v(' + xvStr + ',' + yvStr + ') \\).';
+        htmlV += '</p>';
+        htmlV += '<p>On calcule : ';
+        htmlV += '\\[ \\vec u \\cdot \\vec v = ' + xuStr + ' \\times ' + xvStr + ' + ' + yuStr + ' \\times ' + yvStr + ' = ' + dotStr + ' . \\]';
+        htmlV += '</p>';
+      } else if (mode === 'normes') {
+        htmlV += '<p><strong>Formule via les normes et le cosinus :</strong> ';
+        htmlV += '\\( \\vec u \\cdot \\vec v = ||\\vec u||\\,||\\vec v||\\,\\cos((\\vec u, \\vec v)) . \\)';
+        htmlV += '</p>';
+        htmlV += '<p>Dans le repère orthonormé :';
+        htmlV += '\\[ ||\\vec u|| = \\sqrt{x_u^2 + y_u^2} = \\sqrt{' + nu2 + '} = ' + normUExact + ',\\quad ||\\vec v|| = \\sqrt{x_v^2 + y_v^2} = \\sqrt{' + nv2 + '} = ' + normVExact + ' . \\]';
+        htmlV += '</p>';
+        htmlV += '<p>Le produit scalaire est alors :';
+        htmlV += '\\[ \\vec u \\cdot \\vec v = ' + normUExact + ' \\times ' + normVExact + ' \\times \\cos((\\vec u, \\vec v)) = ' + dotStr + ' . \\]';
+        htmlV += '</p>';
+      } else {
+        htmlV += '<p><strong>Deux expressions équivalentes du produit scalaire :</strong></p>';
+        htmlV += '<p>Dans un repère orthonormé :';
+        htmlV += '\\[ \\vec u \\cdot \\vec v = x_u x_v + y_u y_v = ||\\vec u||\\,||\\vec v||\\,\\cos((\\vec u, \\vec v)) . \\]';
+        htmlV += '</p>';
+        htmlV += '<p>Avec les coordonnées choisies :';
+        htmlV += '\\[ \\vec u \\cdot \\vec v = ' + xuStr + ' \\times ' + xvStr + ' + ' + yuStr + ' \\times ' + yvStr + ' = ' + dotStr + '. \\]';
+        htmlV += '<p>Et en utilisant les normes :';
+        htmlV += '\\[ ||\\vec u|| = ' + normUExact + ',\\quad ||\\vec v|| = ' + normVExact + ',\\quad \\cos((\\vec u, \\vec v)) = \\dfrac{' + dotStr + '}{' + normUExact + ' \\times ' + normVExact + '}. \\]';
+        htmlV += '</p>';
+      }
+
+      explanation.innerHTML = htmlV;
+
+      let thetaOriented = Math.atan2(yv, xv) - Math.atan2(yu, xu);
+      while (thetaOriented <= -Math.PI) thetaOriented += 2 * Math.PI;
+      while (thetaOriented > Math.PI) thetaOriented -= 2 * Math.PI;
+      const thetaAbs = Math.abs(thetaOriented);
+
+      angleInfo.textContent = 'Angle (u,v) ≈ ' + formatAngle(thetaAbs, angleUnit) + ' (0° ≤ θ ≤ 180°).';
+
+      const u = { x: xu, y: yu };
+      const v = { x: xv, y: yv };
+      drawVectors(u, v, thetaOriented);
+
+      if (window.MathJax) MathJax.typesetPromise();
+    }
+
+    function setupModeToggle(containerId, inputName) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.addEventListener('change', (e) => {
+        if (e.target.name === inputName) {
+          const labels = container.querySelectorAll('.mode-option');
+          labels.forEach(l => l.classList.remove('active'));
+          e.target.closest('.mode-option').classList.add('active');
+          updateCalculations();
+        }
+      });
+    }
+
+    function setupWorkModeToggle() {
+      const container = document.getElementById('workModeContainer');
+      const vectorBlock = document.getElementById('vectorModeBlock');
+      const triangleBlock = document.getElementById('triangleModeBlock');
+      const angleBlock = document.getElementById('angleModeBlock');
+      container.addEventListener('change', (e) => {
+        if (e.target.name === 'workMode') {
+          const labels = container.querySelectorAll('.mode-option');
+          labels.forEach(l => l.classList.remove('active'));
+          e.target.closest('.mode-option').classList.add('active');
+          const mode = e.target.value;
+          vectorBlock.style.display = (mode === 'vecteurs') ? '' : 'none';
+          triangleBlock.style.display = (mode === 'triangle') ? '' : 'none';
+          angleBlock.style.display = (mode === 'angle') ? '' : 'none';
+          updateCalculations();
+        }
+      });
+    }
+
+    function setupInputs() {
+      const ids = ['xu','yu','xv','yv','AB','AC','BC','Nu','Nv','thetaInput'];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener('input', () => {
+            updateCalculations();
+          });
+        }
+      });
+    }
+
+    window.addEventListener('load', () => {
+      setupWorkModeToggle();
+      setupModeToggle('formulaModeContainer', 'formulaMode');
+      setupModeToggle('angleUnitContainer', 'angleUnit');
+      setupInputs();
+      clearCanvas();
+      updateCalculations();
+    });
+  </script>
+</body>
+</html>
